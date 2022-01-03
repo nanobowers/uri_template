@@ -1,6 +1,9 @@
-# uri_template
+# URITemplate - a uri template library
 
-TODO: Write a description here
+With URITemplate you can generate URIs based on templates.
+The template syntax is defined by the [RFC 6570]( http://tools.ietf.org/html/rfc6570 ) spec.
+
+This shard supports expansion and partial expansion (but not extraction).
 
 ## Installation
 
@@ -9,22 +12,52 @@ TODO: Write a description here
    ```yaml
    dependencies:
      uri_template:
-       github: your-github-user/uri_template
+       github: nanobowers/uri_template
    ```
-
+   
 2. Run `shards install`
 
 ## Usage
 
 ```crystal
 require "uri_template"
+
+tpl = URITemplate.new("http://{host}{/segments*}/{file}{.extensions*}")
+
+# This will fuly expand the template:
+tpl.expand(host: "www.host.com", segments: ["path","to","a"], file: "file", extensions: ["x","y"])
+# => "http://www.host.com/path/to/a/file.x.y"
+
+# This will give a new uri template with just the host expanded:
+tpl.expand_partial(host: "www.host.com")
+# => <URITemplate::Template:0x7fb7e1bb1e40 ...> 
 ```
 
-TODO: Write usage instructions here
+## RFC 6570 Syntax
 
-## Development
+The syntax defined by [RFC 6570]( http://tools.ietf.org/html/rfc6570 ) has lots of features.
+Generally, anything surrounded by curly brackets is interpreted as variable.
 
-TODO: Write development instructions here
+```crystal
+URITemplate.new("{variable}").expand(variable: "value")
+# => "value"
+```
+
+The way variables are inserted can be modified using operators. The operator is the first character between the curly brackets. There are seven operators de
+fined `#`, `+`, `;`, `?`, `&`, `/` and `.`. So if you want to create a form-style query do this:
+
+```crystal
+URITemplate.new("{?variable}").expand(variable: "value")
+# => "?variable=value"
+```
+
+## Testing
+
+```sh
+git submodule init
+git submodule update
+crystal spec
+```
 
 ## Contributing
 
@@ -36,4 +69,10 @@ TODO: Write development instructions here
 
 ## Contributors
 
-- [Ben Bowers](https://github.com/your-github-user) - creator and maintainer
+- [Ben Bowers](https://github.com/nanobowers) - creator and maintainer
+
+## License
+
+[MIT License](LICENSE)
+
+Note that the included `uritemplate-test` submodule is Apache v2.0 licensed.
